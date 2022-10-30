@@ -1,47 +1,41 @@
 /// <reference types="cypress" />
 
+import { TodoPage } from "../page-objects/todo-page"
+
 describe("Filtering", () => {
+    const todoPage = new TodoPage()
 
     beforeEach(()=>{
-        cy.visit('http://todomvc-app-for-testing.surge.sh')
+        todoPage.navigate()
         cy.get('h1').should('have.text','todos')
-        cy.get('body').type("learn cypress{enter}")
-        cy.get('body').type("learn javascript{enter}")
-        cy.get('body').type("use mocha{enter}")
-
+        todoPage.addTodo("learn cypress")
+        todoPage.addTodo("learn javascript")
+        todoPage.addTodo("use mocha")
     })
     it('should have the added todos on the list',()=>{
-        cy.get(':nth-child(3) > .view > label').should('have.text','learn cypress')
-        cy.get(':nth-child(2) > .view > label').should('have.text','learn javascript')
-        cy.get(':nth-child(1) > .view > label').should('have.text','use mocha')
-
-
+        todoPage.validateTodoText(2,'learn cypress')
+        todoPage.validateTodoText(1,'learn javascript')
+        todoPage.validateTodoText(0,'use mocha')
     })
     it('should filter Active todos',()=>{
-
-        cy.get(':nth-child(3) > .view > .toggle').click()
-        cy.contains('Active').click()
-        cy.get('.todo-list li').should('have.length',2)
-        cy.contains('Completed').click()
-        cy.get('.todo-list li').should('have.length',1)
-        cy.contains('All').click()
-        cy.get('.todo-list li').should('have.length',3)
+        todoPage.toggle(2)
+        todoPage.activeClick()
+        todoPage.validateNumberOfTodos(2)
+        todoPage.completedClick()
+        todoPage.validateNumberOfTodos(1)
+        todoPage.allClick()
+        todoPage.validateNumberOfTodos(3)
 
     })
     it('should filter Completed todos',()=>{
-
-        cy.get(':nth-child(3) > .view > .toggle').click()
-    
-        cy.contains('Completed').click()
-        cy.get('.todo-list li').should('have.length',1)
-    
+        todoPage.toggle(2)
+        todoPage.completedClick()
+        todoPage.validateNumberOfTodos(1)
     })
     it('should filter All todos',()=>{
-
-        cy.get(':nth-child(3) > .view > .toggle').click()
-    
-        cy.contains('All').click()
-        cy.get('.todo-list li').should('have.length',3)
+        todoPage.toggle(2)
+        todoPage.allClick()
+        todoPage.validateNumberOfTodos(3)
 
     })
 
